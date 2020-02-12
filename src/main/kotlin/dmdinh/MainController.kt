@@ -30,7 +30,12 @@ fun main(args: Array<String>) {
             val todos: List<Todo> = using(sessionOf(HikariCP.dataSource())) { session ->
                 session.run( queryOf("select id, text, done, created_at from todo").map(todo).asList )
             }
-            jacksonObjectMapper().writeValueAsString(todos)
+
+            if (todos.isNotEmpty()) {
+                jacksonObjectMapper().writeValueAsString(todos)
+            } else {
+                "No todos found."
+            }
         }
 
         post("/") { req, res ->
