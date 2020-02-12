@@ -9,18 +9,29 @@ fun main(args: Array<String>) {
     staticFileLocation("/public")
     setupDb()
 
+    // test route
     get("/hello") { request, response -> "Welcome to my Kotlin Todo App" }
 
+    // to-do routes
     path("/todo") {
+        // DTO
         data class Todo(val id: Long, val text: String, val done: Boolean, val createdAt: java.time.LocalDateTime)
-
         val todo: (Row) -> Todo = { row -> Todo(row.long(1), row.string(2), row.boolean(3), row.localDateTime(4))}
 
         fun getTodo(id: Long): Todo? = using(sessionOf(HikariCP.dataSource())) { session ->
             session.run(queryOf("select id, text, done, created_at from todo where id=?", id).map(todo).asSingle)
         }
 
-        get("/") { req, res -> "Hello world"}
+        get("/:id") { req, res ->
+            jacksonObjectMapper().writeValueAsString( getTodo(req.params("id").toLong()))
+        }
+
+        get("/") { req, res ->
+            val todos: List<Todo> = using(sessionOf(HikariCP.dataSource())) { session ->
+                session.run( queryOf("select id, text, done, created_at from todo").map(todo).asList )
+            }
+            jacksonObjectMapper().writeValueAsString(todos)
+        }
 
         post("/") { req, res ->
             if (req.body().isNullOrEmpty()) badRequest("a todo cannot be blank")
@@ -36,7 +47,6 @@ fun main(args: Array<String>) {
                 jacksonObjectMapper().writeValueAsString( getTodo(id) )
             }
         }
-
     }
 }
 
