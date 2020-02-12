@@ -31,11 +31,7 @@ fun main(args: Array<String>) {
                 session.run( queryOf("select id, text, done, created_at from todo").map(todo).asList )
             }
 
-            if (todos.isNotEmpty()) {
-                jacksonObjectMapper().writeValueAsString(todos)
-            } else {
-                "No todos found."
-            }
+            jacksonObjectMapper().writeValueAsString(todos)
         }
 
         post("/") { req, res ->
