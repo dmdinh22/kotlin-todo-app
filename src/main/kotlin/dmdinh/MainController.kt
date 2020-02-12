@@ -47,6 +47,18 @@ fun main(args: Array<String>) {
                 jacksonObjectMapper().writeValueAsString( getTodo(id) )
             }
         }
+
+        delete("/:id") { req, res ->
+            val rowsDeleted = using(sessionOf(HikariCP.dataSource())) { session ->
+                session.run(queryOf("delete from todo where id=?", req.params("id").toLong()).asUpdate)
+            }
+
+            if (rowsDeleted == 1) {
+                "ok"
+            } else {
+                serverError("something went wrong")
+            }
+        }
     }
 }
 
