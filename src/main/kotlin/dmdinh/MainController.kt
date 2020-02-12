@@ -2,7 +2,6 @@ package dmdinh
 
 import spark.Spark.*
 import kotliquery.*
-import java.time.LocalDateTime
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 fun main(args: Array<String>) {
@@ -10,7 +9,9 @@ fun main(args: Array<String>) {
     staticFileLocation("/public")
     setupDb()
 
-    path("/todo/") {
+    get("/hello") { request, response -> "Welcome to my Kotlin Todo App" }
+
+    path("/todo") {
         data class Todo(val id: Long, val text: String, val done: Boolean, val createdAt: java.time.LocalDateTime)
 
         val todo: (Row) -> Todo = { row -> Todo(row.long(1), row.string(2), row.boolean(3), row.localDateTime(4))}
@@ -19,9 +20,9 @@ fun main(args: Array<String>) {
             session.run(queryOf("select id, text, done, created_at from todo where id=?", id).map(todo).asSingle)
         }
 
-        get("") { req, res -> "Hello world"}
+        get("/") { req, res -> "Hello world"}
 
-        post("") { req, res ->
+        post("/") { req, res ->
             if (req.body().isNullOrEmpty()) badRequest("a todo cannot be blank")
 
             val todo = req.body()
