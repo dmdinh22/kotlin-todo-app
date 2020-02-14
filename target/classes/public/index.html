@@ -12,6 +12,7 @@
             <ul>
                 <li v-for="todo in todos">
                     {{todo.text}}
+                    <a href="#" @click="deleteTodo(todo.id)">delete</a>
                 </li>
             </ul>
         </div>
@@ -23,14 +24,26 @@
                     todos: []
                 },
                 methods: {
-                    addTodo: function(event) {
+                    addTodo: event => {
                         axios.post("http://localhost:9000/todo/", event.srcElement.value).then(response => {
                             this.todos.push(response.data);
                         });
                         event.srcElement.value = "";
                     },
+                    deleteTodo: id => {
+                        axios.delete("http://localhost:9000/todo/"+id).then(response => {
+                            if (response.data = "ok") {
+                                for(var i = this.todos.length; i--;){
+                                    if (this.todos[i].id === id) this.todos.splice(i, 1);
+                                }
+                            }
+                        });
+                    },
                 },
                 mounted() {
+                    axios.get('http://localhost:9000/todo/').then(response => {
+                        this.todos = response.data;
+                    });
                 }
             })
         </script>
