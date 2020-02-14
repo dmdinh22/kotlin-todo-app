@@ -11,7 +11,8 @@
             <input type="text" @keyup.enter="addTodo">
             <ul>
                 <li v-for="todo in todos">
-                    {{todo.text}}
+                    <input type="checkbox" :checked="todo.done" @click="toggleDone(todo)">
+                        {{todo.text}}
                     <a href="#" @click="deleteTodo(todo.id)">delete</a>
                 </li>
             </ul>
@@ -24,25 +25,44 @@
                     todos: []
                 },
                 methods: {
-                    addTodo: event => {
-                        axios.post("http://localhost:9000/todo/", event.srcElement.value).then(response => {
-                            this.todos.push(response.data);
-                        });
+                    addTodo: function(event) {
+                        axios.post("http://localhost:9000/todo/", event.srcElement.value)
+                            .then(response => {
+                                this.todos.push(response.data);
+                            });
                         event.srcElement.value = "";
                     },
-                    deleteTodo: id => {
-                        axios.delete("http://localhost:9000/todo/"+id).then(response => {
-                            if (response.data = "ok") {
-                                for(var i = this.todos.length; i--;){
-                                    if (this.todos[i].id === id) this.todos.splice(i, 1);
+                    update: function(todo) {
+                        axios.put(`http://localhost:9000/todo/${todo.id}`, {"text": todo.text, "done": todo.done})
+                            .then(response => {
+                                const {data:{ done, text}} = response
+                                for (let thisTodo in this.todos) {
+                                    if (thisTodo.id === todo.id) {
+                                        thisTodo.done = done
+                                        thisTodo.text = text
+                                    }
                                 }
-                            }
+                        });
+                    },
+                    toggleDone: function(todo) {
+                        todo.done = !todo.done;
+                        this.update(todo);
+                    },
+                    deleteTodo: function(id) {
+                        axios.delete(`http://localhost:9000/todo/${id}`)
+                            .then(response => {
+                                if (response.data = "ok") {
+                                    for(var i = this.todos.length; i--;){
+                                        if (this.todos[i].id === id) this.todos.splice(i, 1);
+                                    }
+                                }
                         });
                     },
                 },
                 mounted() {
-                    axios.get('http://localhost:9000/todo/').then(response => {
-                        this.todos = response.data;
+                    axios.get('http://localhost:9000/todo/')
+                        .then(response => {
+                            this.todos = response.data;
                     });
                 }
             })
