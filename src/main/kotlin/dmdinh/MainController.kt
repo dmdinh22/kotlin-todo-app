@@ -49,39 +49,47 @@ fun main(args: Array<String>) {
                 } else {
                     jacksonObjectMapper().writeValueAsString( getTodo(id) )
                 }
-            } catch (e: HttpException) {
+            } catch (e: Error) {
                 println(e)
             }
         }
 
         put("/:id") { req, res ->
-            val update = jacksonObjectMapper().readTree(req.body())
-            if (!update.has("text") || !update.has("done")) {
-                badRequest("text and done is required in JSON request body")
-            }
+            try {
+                val update = jacksonObjectMapper().readTree(req.body())
+                if (!update.has("text") || !update.has("done")) {
+                    badRequest("text and done is required in JSON request body")
+                }
 
-            val rowsUpdated = using(sessionOf(HikariCP.dataSource())) { session ->
-                session.run(queryOf("update todo set text=?, done=? where id=?",
-                        update.get("text").asText(), update.get("done").asBoolean(), req.params("id").toLong())
-                        .asUpdate)
-            }
+                val rowsUpdated = using(sessionOf(HikariCP.dataSource())) { session ->
+                    session.run(queryOf("update todo set text=?, done=? where id=?",
+                            update.get("text").asText(), update.get("done").asBoolean(), req.params("id").toLong())
+                            .asUpdate)
+                }
 
-            if (rowsUpdated == 1) {
-                jacksonObjectMapper().writeValueAsString(getTodo(req.params("id").toLong()))
-            } else {
-                serverError("Something went wrong with the update, please try again later.")
+                if (rowsUpdated == 1) {
+                    jacksonObjectMapper().writeValueAsString(getTodo(req.params("id").toLong()))
+                } else {
+                    serverError("Something went wrong with the update, please try again later.")
+                }
+            } catch(e: Error) {
+                println(e)
             }
         }
 
         delete("/:id") { req, res ->
-            val rowsDeleted = using(sessionOf(HikariCP.dataSource())) { session ->
-                session.run(queryOf("delete from todo where id=?", req.params("id").toLong()).asUpdate)
-            }
+            try {
+                val rowsDeleted = using(sessionOf(HikariCP.dataSource())) { session ->
+                    session.run(queryOf("delete from todo where id=?", req.params("id").toLong()).asUpdate)
+                }
 
-            if (rowsDeleted == 1) {
-                "ok"
-            } else {
-                serverError("Something went wrong with the delete, please try again later.")
+                if (rowsDeleted == 1) {
+                    "ok"
+                } else {
+                    serverError("Something went wrong with the delete, please try again later.")
+                }
+            } catch (e: Error) {
+              println(e)
             }
         }
     }
