@@ -1,10 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Todo app - Kotlin</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Todo app - Kotlin / VueJS</title>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+    </head>
+    <body>
+        <div id="vueApp">
+            <input type="text" @keyup.enter="addTodo">
+            <ul>
+                <li v-for="todo in todos">
+                    {{todo.text}}
+                </li>
+            </ul>
+        </div>
 
-</body>
+        <script>
+            var app = new Vue({
+                el: '#vueApp',
+                data: {
+                    todos: []
+                },
+                methods: {
+                    addTodo: function(event) {
+                        axios.post("http://localhost:9000/todo/", event.srcElement.value).then(response => {
+                            this.todos.push(response.data);
+                        });
+                        event.srcElement.value = "";
+                    },
+                },
+                mounted() {
+                }
+            })
+        </script>
+    </body>
 </html>
