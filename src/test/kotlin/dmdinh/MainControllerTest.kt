@@ -25,7 +25,12 @@ class UsageTest {
         val get1 = Fuel.get("http://localhost:9000/todo/").responseString()
         assertEquals("[]", get1.third.get(), "In the beginning, we should not have any todo items.")
 
-        val post1 = Fuel.post("http://localhost:9000/todo/").body("first test todo").responseString()
+        val post1TestBodyJson = """
+            {   "text": "this is the first test",
+                "done": false
+            }
+        """
+        val post1 = Fuel.post("http://localhost:9000/todo/").body(post1TestBodyJson).responseString()
         assertEquals(200, post1.second.httpStatusCode, "should have returned a 200 with the complete todo added")
         val json = jacksonObjectMapper().readTree(post1.third.get())
         assertEquals(1, json.get("id").asLong(), "first todo's id should be equal to 1")

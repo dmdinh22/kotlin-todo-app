@@ -3,6 +3,7 @@ package dmdinh
 import spark.Spark.*
 import kotliquery.*
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.kittinunf.fuel.core.HttpException
 
 fun main(args: Array<String>) {
     port(9000)
@@ -35,17 +36,21 @@ fun main(args: Array<String>) {
         }
 
         post("/") { req, res ->
-            if (req.body().isNullOrEmpty()) badRequest("a todo cannot be blank")
+            try {
+                if (req.body().isNullOrEmpty()) badRequest("a todo cannot be blank")
 
-            val todo = req.body()
-            val id = using(sessionOf(HikariCP.dataSource())) { session ->
-                session.run(queryOf("insert into todo (text) values(?)", todo).asUpdateAndReturnGeneratedKey)
-            }
+                val todo = req.body()
+                val id = using(sessionOf(HikariCP.dataSource(), returnGeneratedKey = true)) { session ->
+                    session.run(queryOf("insert into todo (text) values(?)", todo).asUpdateAndReturnGeneratedKey)
+                }
 
-            if (id == null) {
-                internalServerError("there was a problem creating the Todo")
-            } else {
-                jacksonObjectMapper().writeValueAsString( getTodo(id) )
+                if (id == null) {
+                    internalServerError("there was a problem creating the Todo")
+                } else {
+                    jacksonObjectMapper().writeValueAsString( getTodo(id) )
+                }
+            } catch (e: HttpException) {
+                println(e)
             }
         }
 
@@ -97,6 +102,6 @@ fun setupDb() {
             done boolean default false,
             created_at timestamp not null default now()
           )
-        """).asExecute) // returns Boolean
+        """).asExecute) // returns bool
     }
 }
