@@ -26,7 +26,7 @@
                 },
                 methods: {
                     addTodo: function(event) {
-                        axios.post("http://localhost:9000/todo/", event.srcElement.value)
+                        axios.post('http://localhost:9000/todo/', event.srcElement.value)
                             .then(response => {
                                 this.todos.push(response.data);
                             });
@@ -35,7 +35,8 @@
                     update: function(todo) {
                         axios.put(`http://localhost:9000/todo/${todo.id}`, {"text": todo.text, "done": todo.done})
                             .then(response => {
-                                const {data:{ done, text}} = response
+                                const { data: { done, text} } = response;
+
                                 for (let thisTodo in this.todos) {
                                     if (thisTodo.id === todo.id) {
                                         thisTodo.done = done

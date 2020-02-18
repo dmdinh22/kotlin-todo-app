@@ -72,3 +72,6 @@ fabric.properties
 
 # target dir
 target
+
+.settings
+.vscode
