@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service # type of kube resource
+metadata:
+  name: kotlin-todo-app # name of kube resource
+  labels: # labels applied to resource
+    app: kotlin-todo-app
+spec:
+  type: NodePort # gives each node an external IP - accessible external of cluster & opens port
+  selector:
+    app: kotlin-todo-app # Selects any pod with label kotlin-todo-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

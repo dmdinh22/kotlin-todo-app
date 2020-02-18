@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment # type of kube resource
+metadata:
+  name: kotlin-todo-app # name of kube resource
+  labels:
+    app: kotlin-todo-app
+spec:
+  replicas: 1 # number of pods to run
+  selector:
+    matchLabels:
+      app: kotlin-todo-app # deploys any pods matching label given
+  template: # deployment creates set of pods using config in this template
+    metadata:
+      labels: # labels that will be applied to all the pods
+        app: kotlin-todo-app
+    spec: # spec for container that'll run in pod
+      containers:
+        - name: kotlin-todo-app
+          image: dmdinh/kotlin-todo-app:1.0.0 # image from dockerhub
+          imagePullPolicy: IfNotPresent # pull if it hasn't been before
+          ports:
+            - name: http
+              containerPort: 9000 # matches port number that server listens to
