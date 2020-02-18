@@ -1,0 +1,20 @@
+version: '3'
+services:
+  # !API container/service
+  app:
+    container_name: kotlin-todo-app
+    build: .
+    ports:
+      - 9000:9000
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    networks:
+      - kotlin-todo-app
+
+volumes:
+  api:
+
+networks:
+  kotlin-todo-app:
+    driver: bridge

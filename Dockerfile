@@ -19,6 +19,6 @@ RUN ls -l /app/target
 FROM openjdk:8-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/kotlin-todo-app-1.0-SNAPSHOT.jar /app
-EXPOSE 8080
-CMD ["java -jar kotlin-todo-app-1.0-SNAPSHOT.jar"]
+EXPOSE 9000
+CMD ["java", "-jar", "kotlin-todo-app-1.0-SNAPSHOT.jar"]
 
