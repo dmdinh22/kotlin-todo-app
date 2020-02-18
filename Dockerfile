@@ -1,4 +1,5 @@
 FROM alpine/git as clone
+
 # create app src dir
 RUN mkdir -p /app
 # set home dir
@@ -9,9 +10,10 @@ WORKDIR /app
 # copy src code to container
 COPY . /app
 # build with maven
-# RUN mvn clean package
+RUN mvn clean package
 RUN mvn install
 
+# debugging - ls the content of /app/target dir
 RUN ls -l /app/target
 
 FROM openjdk:8-jre-alpine
