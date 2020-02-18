@@ -6,31 +6,68 @@
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/vue"></script>
     </head>
+    <style>
+        table {
+            border-collapse: collapse;
+            overflow-x: auto;
+            width:50%;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
     <body>
         <div id="vueApp">
-            <input type="text" @keyup.enter="addTodo">
-            <ul>
-                <li v-for="todo in todos">
-                    <input type="checkbox" :checked="todo.done" @click="toggleDone(todo)">
+            <h3>Enter your todo in the input below:</h3>
+            <form @submit.prevent="addTodo">
+                <label>Add Todo:</label>
+                <input type="text" placeholder="Add Todo" class="input" name="todo" v-model="todo" @keyup.enter="addTodo">
+            </form>
+
+            <h4 v-if="todos.length > 0">Todo list:</h4>
+            <table v-if="todos.length > 0" border="1">
+                <tbody>
+                <tr>
+                    <th>Completed</th>
+                    <th>Todo Item</th>
+                    <th>Delete</th>
+                </tr>
+
+                <tr v-for="todo in todos">
+                    <td>
+                        <input type="checkbox" :checked="todo.done" @click="toggleDone(todo)">
+                    </td>
+                    <td>
                         {{todo.text}}
-                    <a href="#" @click="deleteTodo(todo.id)">delete</a>
-                </li>
-            </ul>
+                    </td>
+                    <td>
+                        <a href="#" @click="deleteTodo(todo.id)">delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
         <script>
             var app = new Vue({
                 el: '#vueApp',
                 data: {
-                    todos: []
+                    todos: [],
+                    todo: ''
                 },
                 methods: {
-                    addTodo: function(event) {
-                        axios.post('http://localhost:9000/todo/', event.srcElement.value)
+                    addTodo: function(e) {
+                        axios.post('http://localhost:9000/todo/',  e.srcElement.value)
                             .then(response => {
                                 this.todos.push(response.data);
                             });
-                        event.srcElement.value = "";
+                        e.srcElement.value = "";
                     },
                     update: function(todo) {
                         axios.put(`http://localhost:9000/todo/${todo.id}`, {"text": todo.text, "done": todo.done})
