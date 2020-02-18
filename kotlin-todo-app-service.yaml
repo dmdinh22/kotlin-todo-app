@@ -10,5 +10,5 @@ spec:
     app: kotlin-todo-app # Selects any pod with label kotlin-todo-app
   ports:
     - name: http
-      port: 8080
-      targetPort: 8080
+      port: 9000
+      targetPort: 9000
