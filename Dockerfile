@@ -12,9 +12,11 @@ COPY . /app
 # RUN mvn clean package
 RUN mvn install
 
+RUN ls -l /app/target
+
 FROM openjdk:8-jre-alpine
 WORKDIR /app
-COPY --from=0 /app/target/kotlin-todo-app-1.0.0 /app
+COPY --from=build /app/target/kotlin-todo-app-1.0-SNAPSHOT.jar /app
 EXPOSE 8080
-CMD ["java -jar kotlin-todo-app-1.0.0.jar"]
+CMD ["java -jar kotlin-todo-app-1.0-SNAPSHOT.jar"]
 
