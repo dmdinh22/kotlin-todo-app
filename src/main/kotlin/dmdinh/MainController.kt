@@ -100,16 +100,16 @@ fun badRequest(reason: String) = halt(400, reason)
 fun serverError(reason: String) = halt(500, reason)
 
 fun setupDb() {
-    HikariCP.default("jdbc:h2:mem:todo", "user", "pass")
-    // when using in-mem db, create DDL
-    using(sessionOf(HikariCP.dataSource())) { session ->
-        session.run(queryOf("""
-          create table todo (
-            id serial not null primary key,
-            text varchar(255),
-            done boolean default false,
-            created_at timestamp not null default now()
-          )
-        """).asExecute) // returns bool
-    }
+  HikariCP.default("jdbc:h2:mem:todo", "user", "pass")
+  // when using in-mem db, create DDL
+  using(sessionOf(HikariCP.dataSource())) { session ->
+      session.run(queryOf("""
+        create table todo (
+          id serial not null primary key,
+          text varchar(255),
+          done boolean default false,
+          created_at timestamp not null default now()
+        )
+      """).asExecute) // returns bool
+  }
 }
